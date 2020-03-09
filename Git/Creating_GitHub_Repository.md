@@ -14,4 +14,4 @@ Now, if you noticed by default a GitHub repository is public which means that an
 Congratulations, your repository is successfully created! It will look like the below screenshot:  
 ![GitHub-Tutorial - how to use GitHub](https://d1jnx9ba8s6j9r.cloudfront.net/blog/wp-content/uploads/2017/11/GitHub-Tutorial-how-to-use-GitHub-Edureka.png)  
 
-So now my central repository has been sucessfully created! Once this is done, you are ready to commit, pull, push and perform all the other operations. Now let’s move forward and understand branching in GitHub.  
+So now my central repository has been sucessfully created! Once this is done, you are ready to commit, pull, push and perform all the other operations.
