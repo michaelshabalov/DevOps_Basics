@@ -32,10 +32,57 @@ pipeline {
 }
 ```
 
-4. Add new Jenkins slave  
+4. Create Jenkins slave vagrant project
+- Vagrantfile
+```
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure('2') do |config|
+    config.vm.define 'jenkins_slave' do |jsl|
+        jsl.vm.box = 'centos/7'
+        jsl.vm.hostname = 'jenkins-slave'
+        jsl.vm.provider 'virtualbox' do |vb|
+            vb.name = 'jenkins_slave'
+            vb.memory = '2048'
+            vb.cpus = '1'
+        end
+        jsl.vm.network 'private_network', ip: '192.168.40.11'
+        jsl.vm.provision 'shell', path: 'jenkins_slave_bootstrap.sh'
+    end
+end
+```
+
+- jenkins_slave_bootstrap.sh
+```
+#!/usr/bin/env bash
+
+echo 'Hello! I am a Jenkins Slave...'
+
+# Install wget
+yum install wget git -y
+
+# Install java
+yum install java-1.8* -y
+
+# Set up JAVA_HOME variable
+FILE=/etc/profile.d/jdk_home.sh
+if [ -f "$FILE" ]; then
+    echo "$FILE exist"
+else
+    echo "$FILE does not exist"
+    touch $FILE
+    JAVA_HOME_TEMP=`sudo find /usr/lib/jvm/java-1.8* | head -n 3 | tail -n 1`
+    echo '#!/bin/sh' > $FILE
+    echo "export JAVA_HOME=$JAVA_HOME_TEMP" >> $FILE
+    echo 'export PATH=$PATH:$JAVA_HOME' >> $FILE
+fi
+```
+
+5. Add new Jenkins slave  
 `http://yallalabs.com/devops/how-to-add-linux-slave-node-agent-node-jenkins/`
 
-5. Create simple job to check Jenkins slave  
+6. Create simple job to check Jenkins slave  
 ```
 pipeline {
     agent {
