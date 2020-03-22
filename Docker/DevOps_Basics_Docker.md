@@ -8,6 +8,7 @@
 **[`Deploy_on_Docker` Jenkins job](#deploy_on_docker-jenkins-job)**  
 **[Tomcat server Dockerfile](#tomcat-server-dockerfile)**  
 **[`Deploy_on_Container` Jenkins job](#deploy_on_container-jenkins-job)**  
+**[Setup Docker Registry](#setup-docker-registry)**  
 
 ### Prerequisites
 - VirtualBox
@@ -173,4 +174,98 @@
 - Observe result in browser
     ```
     http://192.168.40.15:8080/webapp/
+    ```
+### Setup Docker Registry
+Source: https://www.centlinux.com/2019/03/configure-private-docker-registry-centos-7.html
+- Login to Docker-Host VM
+    ```
+    vagrant ssh
+    sudo su - root
+    ```
+- Generate a self-signed digital certificate
+    ```
+    mkdir -p /var/lib/docker/containers/docker-registry/certs
+    openssl req \
+    -newkey rsa:2048 \
+    -nodes -sha256 \
+    -x509 -days 365 \
+    -keyout /var/lib/docker/containers/docker-registry/certs/docker-registry.key \
+    -out /var/lib/docker/containers/docker-registry/certs/docker-registry.crt
+
+    ###
+    Country Name (2 letter code) [XX]:UA
+    State or Province Name (full name) []:Kyiv
+    Locality Name (eg, city) [Default City]:Kyiv
+    Organization Name (eg, company) [Default Company Ltd]:Global DevOps Basics
+    Organizational Unit Name (eg, section) []:ITLAB
+    Common Name (eg, your name or your server's hostname) []:docker-registry.example.com
+    Email Address []:root@docker-01.example.com
+    ###
+    ```
+- Configure Basic HTTP Authentication for Private Docker Registry
+    ```
+    mkdir -p /var/lib/docker/containers/docker-registry/auth
+    docker run \
+    --entrypoint htpasswd \
+    registry -Bbn docker_user 123 > /var/lib/docker/containers/docker-registry/auth/htpasswd
+    ```
+- Create a Directory to persist Private Docker Registry Data
+    ```
+    mkdir /var/lib/docker/containers/docker-registry/registry
+    ```
+- Pull registry image from Docker Hub
+    ```
+    docker pull registry
+    ```
+- Create a container for Private Docker Registry
+    ```
+    docker run -d \
+    --name docker-registry \
+    --restart=always \
+    -p 5000:5000 \
+    -v /var/lib/docker/containers/docker-registry/registry:/var/lib/registry \
+    -v /var/lib/docker/containers/docker-registry/auth:/auth \
+    -e "REGISTRY_AUTH=htpasswd" \
+    -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+    -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+    -v /var/lib/docker/containers/docker-registry/certs:/certs \
+    -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/docker-registry.crt \
+    -e REGISTRY_HTTP_TLS_KEY=/certs/docker-registry.key \
+    registry
+    ```
+- Add IP Address of Private Docker Registry to Local DNS resolver of Docker host
+    ```
+    echo '192.168.40.15 docker-registry.example.com docker-registry' >> /etc/hosts
+    ```
+- Install digital security certificate on Docker host
+    ```
+    mkdir -p /etc/docker/certs.d/docker-registry.example.com:5000
+    cp /var/lib/docker/containers/docker-registry/certs/docker-registry.crt /etc/docker/certs.d/docker-registry.example.com:5000/ca.crt
+    ```
+- Pull an image from Docker Hub. We will later push this image to our Private Docker Registry
+    ```
+    docker pull busybox
+    ```
+- Create another tag for busybox image, so we can push it into our Private Docker Registry
+    ```
+    docker tag busybox:latest docker-registry.example.com:5000/busybox
+    ```
+- Login to docker-registry.example.com using docker command
+    ```
+    docker login docker-registry.example.com:5000
+
+    ###
+    Username: docker_user
+    Password: 123
+    WARNING! Your password will be stored unencrypted in /root/.docker/config.json. Configure a credential helper to remove this warning. See https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+    Login Succeeded
+    ###
+    ```
+- Push busybox image to Private Docker Registry
+    ```
+    docker push docker-registry.example.com:5000/busybox
+    ```
+- Observe result
+    ```
+    ls -la /var/lib/docker/containers/docker-registry/registry
     ```
