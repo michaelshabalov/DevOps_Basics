@@ -44,7 +44,8 @@
     vagrant ssh
     ```
 ### Setup Docker CE
-- Some topic 
+Source: https://docs.docker.com/install/linux/docker-ce/centos/
+- Install packages
     ```
     sudo su - root
     yum install -y \
@@ -61,21 +62,21 @@
     systemctl start docker
     systemctl enable docker
     ```
-
+- Run hello-world container
     ```
     docker pull hello-world:latest
     docker run --name hello-world-container hello-world:latest
     docker ps -a
     docker rm hello-world-container
     ```
-
+- Run tomcat container
     ```
     docker pull tomcat:latest
     docker image list
     docker run --name tomcat-container -p 8080:8080 tomcat:latest
     docker ps -a
     ```
-
+- Explore tomcat container from inside
     ```
     docker exec -it tomcat-container /bin/bash
     cp -R /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps/
