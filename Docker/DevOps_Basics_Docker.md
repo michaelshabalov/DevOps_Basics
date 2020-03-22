@@ -5,9 +5,9 @@
 **[Create Docker-Host VM](#prerequisites)**  
 **[Setup Docker CE](#setup-docker-ce)**  
 **[Jenkins integration](#jenkins-integration)**  
-**[`Deploy_on_Docker` Jenkins job](#deploy-on-docker-jenkins-job)**  
+**[`Deploy_on_Docker` Jenkins job](#deploy_on_docker-jenkins-job)**  
 **[Tomcat server Dockerfile](#tomcat-server-dockerfile)**  
-**[`Deploy_on_Container` Jenkins job](#deploy-on-container-jenkins-job)**  
+**[`Deploy_on_Container` Jenkins job](#deploy_on_container-jenkins-job)**  
 
 ### Prerequisites
 - VirtualBox
