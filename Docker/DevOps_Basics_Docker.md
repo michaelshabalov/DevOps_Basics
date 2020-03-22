@@ -235,7 +235,7 @@ Source: https://www.centlinux.com/2019/03/configure-private-docker-registry-cent
     ```
 - Add IP Address of Private Docker Registry to Local DNS resolver of Docker host
     ```
-    echo '192.168.40.15 docker-registry.example.com docker-registry' >> /etc/hosts
+    echo '127.0.0.1 docker-registry.example.com docker-registry' >> /etc/hosts
     ```
 - Install digital security certificate on Docker host
     ```
