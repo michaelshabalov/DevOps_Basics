@@ -48,7 +48,7 @@
 Source: https://docs.docker.com/install/linux/docker-ce/centos/
 - Install packages
     ```
-    sudo su - root
+    sudo su -
     yum install -y \
         yum-utils \
         device-mapper-persistent-data \
