@@ -13,6 +13,7 @@
 ### Prerequisites
 - VirtualBox
 - Vagrant
+- Jenkins
 ### Create Docker-Host VM
 - Create Vagrant project
     ```
